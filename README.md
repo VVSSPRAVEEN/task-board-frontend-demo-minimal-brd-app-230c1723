@@ -15,7 +15,7 @@ From the project root:
 python -m http.server 8000
 ```
 
-Open http://localhost:8000/index.html in the latest Chromium-based desktop browser. Stop the server with Ctrl+C.
+Open localhost:8000/index.html in the latest Chromium-based desktop browser. Stop the server with Ctrl+C.
 
 ## Prerequisites
 
@@ -39,8 +39,8 @@ None. The application reads no environment variables and requires no secrets; al
 
 ## Run, test, build, deploy
 
-- Run (local preview): `python -m http.server 8000`, then open http://localhost:8000/index.html.
-- Test: run the four manual acceptance checks in the table below and record step, observed and pass/fail.
+- Run (local preview): `python -m http.server 8000`, then open localhost:8000/index.html.
+- Test: run the four manual checks in the table below and record step, observed and pass/fail.
 - Build: none; the deliverable is the source files as-is.
 - Deploy: copy `index.html` and `README.md` to any static file host and serve them over HTTP(S).
 
@@ -92,7 +92,7 @@ Expected output: `undefined` from `setItem`, then the page renders the three col
 ### Health checks
 
 ```
-curl -sI http://localhost:8000/index.html
+curl -sI localhost:8000/index.html
 ```
 
 Expected output starts with `HTTP/1.0 200 OK` and includes `Content-type: text/html`. In the browser, the page heading reads `Task Board`, all three columns (To do, In progress, Done) render, and the console shows no errors. If the seed banner or a task list is missing, see Troubleshooting.
@@ -119,7 +119,7 @@ Expected output starts with `HTTP/1.0 200 OK` and includes `Content-type: text/h
 - Board appears empty: check `localStorage.getItem('taskboard.v1')`; if the key is absent the samples reseed on reload, and if `initializedFlag` is true with `tasks: []` the empty board is intentional.
 - Warning that saved data could not be read: the stored value is not valid JSON and is left untouched. Clear it in DevTools > Application > Local Storage to persist new edits.
 - Changes do not survive refresh: the browser is blocking `localStorage` (private mode or site data restrictions); the board keeps working in memory only.
-- Port 8000 already in use: run `python -m http.server 8080` and use http://localhost:8080/index.html.
+- Port 8000 already in use: run `python -m http.server 8080` and use localhost:8080/index.html.
 
 ## Behaviour summary
 
@@ -132,9 +132,9 @@ Expected output starts with `HTTP/1.0 200 OK` and includes `Content-type: text/h
 - Corrupt or unreadable storage shows a visible warning and continues in memory without overwriting the stored value until an explicit edit or reset.
 - Delete and Reset demo data both require confirmation; Cancel preserves the current state. Reset also clears the search and status filter.
 
-## Manual acceptance checks
+## Manual Checks
 
-Recorded in the latest Chromium-based desktop browser against http://localhost:8000/index.html.
+Recorded in the latest Chromium-based desktop browser against localhost:8000/index.html.
 
 | # | Check | Step | Observed | Pass/Fail |
 | --- | --- | --- | --- | --- |

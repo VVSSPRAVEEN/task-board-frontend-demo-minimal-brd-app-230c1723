@@ -367,6 +367,7 @@
     const warningEl = document.getElementById('storage-warning');
     const searchEl = document.getElementById('search');
     const statusFilterEl = document.getElementById('status-filter');
+    const filterState = { statusFilter: 'all' };
     const resetEl = document.getElementById('reset');
     const clearFiltersEl = document.getElementById('clear-filters');
     const formEl = document.getElementById('task-form');
@@ -417,7 +418,7 @@
         title: title.slice(0, TITLE_MAX),
         description: description.slice(0, DESCRIPTION_MAX),
         status: status,
-        createdAt: typeof raw.createdAt === 'string' && raw.createdAt ? raw.createdAt : new Date().toISOString()
+        // createdAt is intentionally not part of the Task DTO.
       };
     }
 
@@ -479,7 +480,8 @@
     }
 
     function matchesFilters(task) {
-      const statusValue = statusFilterEl.value;
+      filterState.statusFilter = statusFilterEl.value;
+      const statusValue = filterState.statusFilter;
       if (statusValue !== 'all' && task.status !== statusValue) {
         return false;
       }
@@ -680,7 +682,7 @@
           // Status is intentionally unchanged by the edit form.
         }
       } else {
-        tasks.push({ id: createId(), title: title, description: description, status: status, createdAt: new Date().toISOString() });
+        tasks.push({ id: createId(), title: title, description: description, status: status });
       }
 
       cancelEdit();
