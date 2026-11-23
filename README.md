@@ -44,6 +44,76 @@ None. The application reads no environment variables and requires no secrets; al
 - Build: none; the deliverable is the source files as-is.
 - Deploy: copy `index.html` and `README.md` to any static file host and serve them over HTTP(S).
 
+## Runbook
+
+All commands run from the project root unless stated otherwise.
+
+### Deploy
+
+```
+rsync -av --delete index.html README.md user@host:/var/www/taskboard/
+```
+
+Expected output lists `index.html` and `README.md` as transferred and ends with `total size ... speedup ...`. Then confirm the health check below against the public URL.
+
+### Rollback
+
+```
+git log --oneline -5
+git revert --no-edit <bad-sha>
+rsync -av index.html README.md user@host:/var/www/taskboard/
+```
+
+Expected output: `git revert` creates a commit named `Revert "<subject>"`; the rsync reports both files transferred. Reload the site and repeat the health check.
+
+### Migrations
+
+None. Persistence is browser `localStorage` under the versioned key `taskboard.v1`; a schema change requires a new key (for example `taskboard.v2`) plus a one-time read-and-rewrite of the old key, never an in-place mutation of `taskboard.v1`.
+
+### Backup and restore
+
+Back up one browser's board from DevTools > Console:
+
+```
+copy(localStorage.getItem('taskboard.v1'))
+```
+
+Expected output: `undefined` and the JSON value is now on the clipboard. Store that string as `taskboard-<date>.json`.
+
+Restore into a browser:
+
+```
+localStorage.setItem('taskboard.v1', '<pasted-json>')
+location.reload()
+```
+
+Expected output: `undefined` from `setItem`, then the page renders the three columns with the restored tasks and no warning banner.
+
+### Health checks
+
+```
+curl -sI http://localhost:8000/index.html
+```
+
+Expected output starts with `HTTP/1.0 200 OK` and includes `Content-type: text/html`. In the browser, the page heading reads `Task Board`, all three columns (To do, In progress, Done) render, and the console shows no errors. If the seed banner or a task list is missing, see Troubleshooting.
+
+### Incident triage
+
+1. Open DevTools > Console and look for the corrupt-storage warning; if present, capture `localStorage.getItem('taskboard.v1')` before any edit so the stored value is preserved.
+2. Check DevTools > Application > Local Storage for the `taskboard.v1` entry and confirm it parses as JSON.
+3. Reproduce with a hard reload (Ctrl+Shift+R); if the board resets, `localStorage` is blocked (private mode or site data restrictions) and in-memory operation is expected.
+4. If only one browser is affected, restore from the backup string above; if all browsers are affected, roll back the deployed `index.html` using the Rollback section.
+
+## Architecture decisions
+
+- ADR-001 - Single self-contained `index.html` with inline CSS and ES2020 JavaScript: no build step, no backend, deployable as a static file. Trade-off: no code splitting or bundler tooling.
+- ADR-002 - Persistence uses the exact key `taskboard.v1` holding `{ tasks, initializedFlag }`. The `initializedFlag` sentinel keeps an intentionally empty board empty after refresh. Trade-off: the key name encodes the schema version.
+- ADR-003 - Corrupt or unreadable storage is never overwritten on read; the app warns and continues in memory until an explicit edit or reset. Trade-off: the user must act, either by editing or by using Reset demo data, before the stored value is replaced.
+
+## Changelog
+
+- 1.0.0 - Initial delivery: task lifecycle (add, edit, move, delete), case-insensitive search combined with the status filter, `localStorage` persistence under `taskboard.v1`, first-use seeding, empty-board persistence, non-destructive corrupt-storage recovery, and Reset demo data.
+
 ## Troubleshooting
 
 - Board appears empty: check `localStorage.getItem('taskboard.v1')`; if the key is absent the samples reseed on reload, and if `initializedFlag` is true with `tasks: []` the empty board is intentional.

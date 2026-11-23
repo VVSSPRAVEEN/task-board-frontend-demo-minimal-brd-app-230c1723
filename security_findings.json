@@ -16,10 +16,10 @@
     "scanner": "gitleaks",
     "verdict": "PASS",
     "findings": [],
-    "detail": "\n    \u25cb\n    \u2502\u2572\n    \u2502 \u25cb\n    \u25cb \u2591\n    \u2591    gitleaks\n\n\u001b[90m6:13AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mscanned ~1330161 bytes (1.33 MB) in 307ms\u001b[0m\n\u001b[90m6:13AM\u001b[0m \u001b[33mWRN\u001b[0m \u001b[1mleaks found: 1\u001b[0m\n"
+    "detail": "\n    \u25cb\n    \u2502\u2572\n    \u2502 \u25cb\n    \u25cb \u2591\n    \u2591    gitleaks\n\n\u001b[90m6:41AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mscanned ~1522750 bytes (1.52 MB) in 308ms\u001b[0m\n\u001b[90m6:41AM\u001b[0m \u001b[33mWRN\u001b[0m \u001b[1mleaks found: 2\u001b[0m\n"
   },
   "candidate": {
-    "tree_sha256": "6853d823b65f11237e3a141fd38d29af0900072c7fe1552b92ce57b86e525534",
+    "tree_sha256": "ac817879641bf14dde0e99b046c6bc49228977c5e8be87f717de17f812ffa556",
     "file_count": 12
   },
   "run_id": "230c1723-3066-4fe7-8982-593340e3ed3b",
