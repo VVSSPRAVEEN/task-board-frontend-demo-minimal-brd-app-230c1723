@@ -16,7 +16,7 @@
     "scanner": "gitleaks",
     "verdict": "PASS",
     "findings": [],
-    "detail": "\n    \u25cb\n    \u2502\u2572\n    \u2502 \u25cb\n    \u25cb \u2591\n    \u2591    gitleaks\n\n\u001b[90m6:41AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mscanned ~1522750 bytes (1.52 MB) in 308ms\u001b[0m\n\u001b[90m6:41AM\u001b[0m \u001b[33mWRN\u001b[0m \u001b[1mleaks found: 2\u001b[0m\n"
+    "detail": "\n    \u25cb\n    \u2502\u2572\n    \u2502 \u25cb\n    \u25cb \u2591\n    \u2591    gitleaks\n\n\u001b[90m6:54AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mscanned ~1532851 bytes (1.53 MB) in 303ms\u001b[0m\n\u001b[90m6:54AM\u001b[0m \u001b[33mWRN\u001b[0m \u001b[1mleaks found: 2\u001b[0m\n"
   },
   "candidate": {
     "tree_sha256": "ac817879641bf14dde0e99b046c6bc49228977c5e8be87f717de17f812ffa556",
