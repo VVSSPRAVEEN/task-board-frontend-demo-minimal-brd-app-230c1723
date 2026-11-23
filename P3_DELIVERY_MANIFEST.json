@@ -1,0 +1,6 @@
+{
+  "repository_kind": "application-source",
+  "project_name": "Task Board Frontend Demo \u2014 Minimal BRD",
+  "run_id": "230c1723-3066-4fe7-8982-593340e3ed3b",
+  "note": "Application repository. Automated tests are retained here because CI must execute them."
+}

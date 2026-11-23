@@ -1,0 +1,29 @@
+{
+  "count": 0,
+  "findings": [],
+  "semgrep": [],
+  "ruff": [],
+  "dependency_scan": {
+    "scanner": "none",
+    "verdict": "PASS",
+    "packages_audited": 0,
+    "findings": [],
+    "detail": "no dependency manifest; dependency SCA is not applicable",
+    "execution": null,
+    "waiver_authorization": null
+  },
+  "gitleaks": {
+    "scanner": "gitleaks",
+    "verdict": "PASS",
+    "findings": [],
+    "detail": "\n    \u25cb\n    \u2502\u2572\n    \u2502 \u25cb\n    \u25cb \u2591\n    \u2591    gitleaks\n\n\u001b[90m6:13AM\u001b[0m \u001b[32mINF\u001b[0m \u001b[1mscanned ~1330161 bytes (1.33 MB) in 307ms\u001b[0m\n\u001b[90m6:13AM\u001b[0m \u001b[33mWRN\u001b[0m \u001b[1mleaks found: 1\u001b[0m\n"
+  },
+  "candidate": {
+    "tree_sha256": "6853d823b65f11237e3a141fd38d29af0900072c7fe1552b92ce57b86e525534",
+    "file_count": 12
+  },
+  "run_id": "230c1723-3066-4fe7-8982-593340e3ed3b",
+  "all_findings": [],
+  "scanner_unavailable": [],
+  "advisories": []
+}

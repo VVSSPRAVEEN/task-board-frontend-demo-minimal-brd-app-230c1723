@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Task Board</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f2f5fb;
+    --surface: #ffffff;
+    --border: #c7d1e6;
+    --text: #182440;
+    --muted: #4c5a7a;
+    --accent: #1a4fd6;
+    --accent-dark: #123a9e;
+    --danger: #b3261e;
+    --danger-dark: #8c1d17;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 1.5rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    margin: 0 0 0.25rem;
+  }
+
+  h2 {
+    font-size: 1.05rem;
+    margin: 0 0 0.75rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    margin: 0 0 0.35rem;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 0 0 0.5rem;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--accent);
+    color: #ffffff;
+    border-radius: 0.4rem;
+    z-index: 10;
+  }
+
+  .skip-link:focus {
+    left: 0.75rem;
+    top: 0.75rem;
+  }
+
+  :focus-visible {
+    outline: 3px solid #0b57d0;
+    outline-offset: 2px;
+    border-radius: 0.35rem;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .warning {
+    margin: 1rem 0;
+    padding: 0.85rem 1rem;
+    border: 2px solid var(--danger);
+    border-radius: 0.5rem;
+    background: #fdecea;
+    color: #6b120c;
+    font-weight: 600;
+  }
+
+  .toolbar,
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1 1 12rem;
+    min-width: 12rem;
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 0.4rem;
+    background: #ffffff;
+    color: inherit;
+    font: inherit;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--accent);
+    border-radius: 0.4rem;
+    background: var(--accent);
+    color: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: var(--accent-dark);
+  }
+
+  button.secondary {
+    background: #ffffff;
+    color: var(--accent);
+  }
+
+  button.secondary:hover {
+    background: #eaf0ff;
+  }
+
+  button.danger {
+    background: var(--danger);
+    border-color: var(--danger);
+  }
+
+  button.danger:hover {
+    background: var(--danger-dark);
+  }
+
+  button.ghost {
+    background: #ffffff;
+    color: var(--danger);
+    border-color: var(--danger);
+  }
+
+  button.ghost:hover {
+    background: #fdecea;
+  }
+
+  .help {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .error {
+    margin: 0 0 0.5rem;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--danger);
+    border-radius: 0.4rem;
+    background: #fdecea;
+    color: #7a1108;
+    font-weight: 600;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    padding: 1rem;
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .task {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    background: #fbfcff;
+  }
+
+  .task .description {
+    color: var(--muted);
+    overflow-wrap: anywhere;
+  }
+
+  .task-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .task-controls .field {
+    flex: 1 1 8rem;
+    min-width: 8rem;
+  }
+
+  .empty {
+    margin: 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  @media (max-width: 360px) {
+    body {
+      padding: 0.75rem;
+    }
+
+    .board {
+      grid-template-columns: 1fr;
+    }
+
+    .toolbar,
+    .task-controls,
+    .actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .field {
+      min-width: 0;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to task board</a>
+
+<header>
+  <h1>Task Board</h1>
+  <p class="subtitle">Add, edit, move, search and filter tasks. The board is saved in this browser.</p>
+</header>
+
+<div id="storage-warning" class="warning" role="alert" aria-live="assertive" hidden></div>
+
+<section class="toolbar" aria-label="Search and filters">
+  <div class="field">
+    <label for="search">Search tasks</label>
+    <input id="search" type="search" placeholder="Search title or description" autocomplete="off">
+  </div>
+  <div class="field">
+    <label for="status-filter">Filter by status</label>
+    <select id="status-filter">
+      <option value="all">All statuses</option>
+      <option value="To do">To do</option>
+      <option value="In progress">In progress</option>
+      <option value="Done">Done</option>
+    </select>
+  </div>
+  <button type="button" id="clear-filters" class="secondary">Clear filters</button>
+  <button type="button" id="reset" class="danger">Reset demo data</button>
+</section>
+
+<section class="panel" aria-labelledby="editor-heading">
+  <h2 id="editor-heading">Add a task</h2>
+  <form id="task-form" novalidate>
+    <div class="field">
+      <label for="title">Title</label>
+      <input id="title" name="title" type="text" maxlength="80" required aria-describedby="title-help">
+      <p id="title-help" class="help">Required, up to 80 characters.</p>
+    </div>
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" maxlength="280" aria-describedby="description-help"></textarea>
+      <p id="description-help" class="help">Optional, up to 280 characters.</p>
+    </div>
+    <div class="field">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="To do">To do</option>
+        <option value="In progress">In progress</option>
+        <option value="Done">Done</option>
+      </select>
+    </div>
+    <p id="form-error" class="error" role="alert" hidden></p>
+    <div class="actions">
+      <button type="submit" id="submit-button">Add task</button>
+      <button type="button" id="cancel-edit" class="secondary" hidden>Cancel edit</button>
+    </div>
+  </form>
+</section>
+
+<main id="main">
+  <div class="board">
+    <section class="column" aria-labelledby="heading-todo">
+      <h2 id="heading-todo">To do</h2>
+      <ul id="list-todo" class="task-list"></ul>
+      <p id="empty-todo" class="empty" hidden>No tasks in this column.</p>
+    </section>
+    <section class="column" aria-labelledby="heading-progress">
+      <h2 id="heading-progress">In progress</h2>
+      <ul id="list-progress" class="task-list"></ul>
+      <p id="empty-progress" class="empty" hidden>No tasks in this column.</p>
+    </section>
+    <section class="column" aria-labelledby="heading-done">
+      <h2 id="heading-done">Done</h2>
+      <ul id="list-done" class="task-list"></ul>
+      <p id="empty-done" class="empty" hidden>No tasks in this column.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+  (function () {
+    'use strict';
+
+    const STORAGE_KEY = 'taskboard.v1';
+    const TITLE_MAX = 80;
+    const DESCRIPTION_MAX = 280;
+    const COLUMNS = [
+      { status: 'To do', listId: 'list-todo', emptyId: 'empty-todo' },
+      { status: 'In progress', listId: 'list-progress', emptyId: 'empty-progress' },
+      { status: 'Done', listId: 'list-done', emptyId: 'empty-done' }
+    ];
+
+    const warningEl = document.getElementById('storage-warning');
+    const searchEl = document.getElementById('search');
+    const statusFilterEl = document.getElementById('status-filter');
+    const resetEl = document.getElementById('reset');
+    const clearFiltersEl = document.getElementById('clear-filters');
+    const formEl = document.getElementById('task-form');
+    const editorHeadingEl = document.getElementById('editor-heading');
+    const titleEl = document.getElementById('title');
+    const descriptionEl = document.getElementById('description');
+    const statusEl = document.getElementById('status');
+    const submitEl = document.getElementById('submit-button');
+    const cancelEditEl = document.getElementById('cancel-edit');
+    const formErrorEl = document.getElementById('form-error');
+
+    let tasks = [];
+    let editingId = null;
+    let storageBlocked = false;
+    let idCounter = 0;
+
+    function createId() {
+      idCounter += 1;
+      return 'task-' + Date.now().toString(36) + '-' + idCounter.toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    }
+
+    function seedTasks() {
+      return [
+        { id: createId(), title: 'Plan the demo', description: 'Outline the demo flow and assign owners.', status: 'To do' },
+        { id: createId(), title: 'Build the task board', description: 'Create the single-file board with search, filters and storage.', status: 'In progress' },
+        { id: createId(), title: 'Review requirements', description: 'Confirm every requirement is covered before delivery.', status: 'Done' }
+      ];
+    }
+
+    function findTask(id) {
+      return tasks.find(function (task) {
+        return task.id === id;
+      }) || null;
+    }
+
+    function normalizeTask(raw) {
+      if (!raw || typeof raw !== 'object') {
+        return null;
+      }
+      const title = typeof raw.title === 'string' ? raw.title.trim() : '';
+      if (!title) {
+        return null;
+      }
+      const description = typeof raw.description === 'string' ? raw.description.trim() : '';
+      const status = COLUMNS.some(function (column) { return column.status === raw.status; }) ? raw.status : 'To do';
+      return {
+        id: typeof raw.id === 'string' && raw.id ? raw.id : createId(),
+        title: title.slice(0, TITLE_MAX),
+        description: description.slice(0, DESCRIPTION_MAX),
+        status: status,
+        createdAt: typeof raw.createdAt === 'string' && raw.createdAt ? raw.createdAt : new Date().toISOString()
+      };
+    }
+
+    function showWarning(message) {
+      warningEl.textContent = message;
+      warningEl.hidden = false;
+    }
+
+    function showFormError(message) {
+      formErrorEl.textContent = message;
+      formErrorEl.hidden = false;
+    }
+
+    function clearFormError() {
+      formErrorEl.textContent = '';
+      formErrorEl.hidden = true;
+    }
+
+    function persist(force) {
+      if (storageBlocked && !force) {
+        return;
+      }
+      const payload = JSON.stringify({ tasks: tasks, initializedFlag: true });
+      try {
+        window.localStorage.setItem(STORAGE_KEY, payload);
+        storageBlocked = false;
+      } catch (err) {
+        showWarning('This change could not be saved in your browser. It stays visible until you reload the page.');
+      }
+    }
+
+    function loadState() {
+      let raw = null;
+      try {
+        raw = window.localStorage.getItem(STORAGE_KEY);
+      } catch (err) {
+        storageBlocked = true;
+        tasks = seedTasks();
+        showWarning('Browser storage is unavailable, so this board lives in memory only and saved data is left untouched.');
+        return;
+      }
+      if (raw === null) {
+        tasks = seedTasks();
+        persist(true);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.tasks)) {
+          throw new Error('Unexpected board shape');
+        }
+        tasks = parsed.tasks.map(normalizeTask).filter(function (task) { return task !== null; });
+        storageBlocked = false;
+      } catch (err) {
+        storageBlocked = true;
+        tasks = seedTasks();
+        showWarning('Saved board data could not be read. This session runs in memory and the stored value is left untouched until you edit a task or reset the demo data.');
+      }
+    }
+
+    function matchesFilters(task) {
+      const statusValue = statusFilterEl.value;
+      if (statusValue !== 'all' && task.status !== statusValue) {
+        return false;
+      }
+      const searchTerm = searchEl.value.trim().toLowerCase();
+      const query = searchTerm;
+      if (!query) {
+        return true;
+      }
+      return task.title.toLowerCase().indexOf(query) !== -1 || task.description.toLowerCase().indexOf(query) !== -1;
+    }
+
+    function buildTaskItem(task) {
+      const item = document.createElement('li');
+      item.className = 'task';
+      item.setAttribute('data-task-id', task.id);
+
+      const heading = document.createElement('h3');
+      heading.textContent = task.title;
+      item.appendChild(heading);
+
+      if (task.description) {
+        const description = document.createElement('p');
+        description.className = 'description';
+        description.textContent = task.description;
+        item.appendChild(description);
+      }
+
+      const controls = document.createElement('div');
+      controls.className = 'task-controls';
+
+      const statusField = document.createElement('div');
+      statusField.className = 'field';
+
+      const statusLabel = document.createElement('label');
+      statusLabel.textContent = 'Status';
+      statusLabel.setAttribute('for', 'status-select-' + task.id);
+
+      const statusSelect = document.createElement('select');
+      statusSelect.id = 'status-select-' + task.id;
+      statusSelect.className = 'task-status';
+
+      COLUMNS.forEach(function (column) {
+        const option = document.createElement('option');
+        option.value = column.status;
+        option.textContent = column.status;
+        if (column.status === task.status) {
+          option.selected = true;
+        }
+        statusSelect.appendChild(option);
+      });
+
+      statusSelect.addEventListener('change', function () {
+        moveTask(task.id, statusSelect.value);
+      });
+
+      statusField.appendChild(statusLabel);
+      statusField.appendChild(statusSelect);
+      controls.appendChild(statusField);
+
+      const editButton = document.createElement('button');
+      editButton.type = 'button';
+      editButton.className = 'secondary';
+      editButton.textContent = 'Edit';
+      editButton.addEventListener('click', function () {
+        startEdit(task.id);
+      });
+      controls.appendChild(editButton);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.className = 'ghost';
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', function () {
+        deleteTask(task.id);
+      });
+      controls.appendChild(deleteButton);
+
+      item.appendChild(controls);
+      return item;
+    }
+
+    function render() {
+      const visible = tasks.filter(matchesFilters);
+      COLUMNS.forEach(function (column) {
+        const list = document.getElementById(column.listId);
+        const empty = document.getElementById(column.emptyId);
+        list.textContent = '';
+        const inColumn = visible.filter(function (task) {
+          return task.status === column.status;
+        });
+        inColumn.forEach(function (task) {
+          list.appendChild(buildTaskItem(task));
+        });
+        empty.hidden = inColumn.length > 0;
+      });
+    }
+
+    function moveTask(id, status) {
+      const task = findTask(id);
+      if (!task) {
+        return;
+      }
+      task.status = status;
+      persist(true);
+      render();
+    }
+
+    function deleteTask(id) {
+      const task = findTask(id);
+      if (!task) {
+        return;
+      }
+      if (!window.confirm('Delete "' + task.title + '"? This cannot be undone.')) {
+        return;
+      }
+      tasks = tasks.filter(function (entry) {
+        return entry.id !== id;
+      });
+      if (editingId === id) {
+        cancelEdit();
+      }
+      persist(true);
+      render();
+    }
+
+    function resetDemoData() {
+      if (!window.confirm('Reset demo data? This replaces the board with the three sample tasks and clears the search and status filters.')) {
+        return;
+      }
+      tasks = seedTasks();
+      searchEl.value = '';
+      statusFilterEl.value = 'all';
+      cancelEdit();
+      persist(true);
+      render();
+    }
+
+    function clearFilters() {
+      searchEl.value = '';
+      statusFilterEl.value = 'all';
+      render();
+    }
+
+    function startEdit(id) {
+      const task = findTask(id);
+      if (!task) {
+        return;
+      }
+      editingId = id;
+      titleEl.value = task.title;
+      descriptionEl.value = task.description;
+      statusEl.value = task.status;
+      statusEl.disabled = true;
+      editorHeadingEl.textContent = 'Edit task';
+      submitEl.textContent = 'Save changes';
+      cancelEditEl.hidden = false;
+      clearFormError();
+      titleEl.focus();
+    }
+
+    function cancelEdit() {
+      editingId = null;
+      statusEl.disabled = false;
+      formEl.reset();
+      editorHeadingEl.textContent = 'Add a task';
+      submitEl.textContent = 'Add task';
+      cancelEditEl.hidden = true;
+      clearFormError();
+    }
+
+    formEl.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const title = titleEl.value.trim();
+      const description = descriptionEl.value.trim();
+      const status = statusEl.value;
+
+      if (!title) {
+        showFormError('A title is required.');
+        titleEl.focus();
+        return;
+      }
+      if (title.length > TITLE_MAX) {
+        showFormError('Title must be ' + TITLE_MAX + ' characters or fewer after trimming.');
+        titleEl.focus();
+        return;
+      }
+      if (description.length > DESCRIPTION_MAX) {
+        showFormError('Description must be ' + DESCRIPTION_MAX + ' characters or fewer after trimming.');
+        descriptionEl.focus();
+        return;
+      }
+
+      if (editingId) {
+        const task = findTask(editingId);
+        if (task) {
+          task.title = title;
+          task.description = description;
+          // Status is intentionally unchanged by the edit form.
+        }
+      } else {
+        tasks.push({ id: createId(), title: title, description: description, status: status, createdAt: new Date().toISOString() });
+      }
+
+      cancelEdit();
+      persist(true);
+      render();
+    });
+
+    cancelEditEl.addEventListener('click', function () {
+      cancelEdit();
+      titleEl.focus();
+    });
+
+    searchEl.addEventListener('input', render);
+
+    statusFilterEl.addEventListener('change', render);
+
+    clearFiltersEl.addEventListener('click', clearFilters);
+    resetEl.addEventListener('click', resetDemoData);
+
+    loadState();
+    render();
+  })();
+</script>
+</body>
+</html>
